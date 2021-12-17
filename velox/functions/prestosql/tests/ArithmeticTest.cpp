@@ -70,6 +70,23 @@ class ArithmeticTest : public functions::test::FunctionBaseTest {
           std::string(e.what()).find(errorMessage) != std::string::npos);
     }
   }
+
+  template <typename TIn, typename TOut>
+  void assertError(
+      const std::string& expression,
+      const std::vector<TIn>& arg0,
+      const std::string& errorMessage) {
+    auto vector0 = makeFlatVector(arg0);
+
+    try {
+      evaluate<SimpleVector<TOut>>(
+          expression, makeRowVector({vector0}));
+      ASSERT_TRUE(false) << "Expected an error";
+    } catch (const std::exception& e) {
+      ASSERT_TRUE(
+          std::string(e.what()).find(errorMessage) != std::string::npos);
+    }
+  }
 };
 
 TEST_F(ArithmeticTest, divide)
@@ -468,6 +485,35 @@ TEST_F(ArithmeticTest, nan) {
   };
 
   EXPECT_EQ(true, std::isnan(nan().value()));
+}
+
+TEST_F(ArithmeticTest, fromBase) {
+  const auto fromBase = [&](const std::optional<StringView>& a,
+                            std::optional<int64_t> b) {
+    return evaluateOnce<int64_t>(fmt::format("from_base(c0, {})", b.value()), a);
+  };
+
+  EXPECT_EQ(12, fromBase(StringView{"12"}, 10));
+  EXPECT_EQ(26, fromBase(StringView{"1a"}, 16));
+  EXPECT_EQ(3, fromBase(StringView{"11"}, 2));
+  EXPECT_EQ(71, fromBase(StringView{"1z"}, 36));
+
+  assertError<StringView, int64_t>(
+      "from_base(c0, 1)", {StringView{"0"}}, "Radix must be between");
+  assertError<StringView, int64_t>(
+      "from_base(c0, 37)", {StringView{"0"}}, "Radix must be between");
+  assertError<StringView, int64_t>(
+      "from_base(c0, 10)",
+      {StringView{"123xy"}},
+      "Not a valid base-10 number: 123xy.");
+  assertError<StringView, int64_t>(
+      "from_base(c0, 10)",
+      {StringView{"abc12"}},
+      "Not a valid base-10 number: abc12.");
+  assertError<StringView, int64_t>(
+      "from_base(c0, 10)",
+      {StringView{"922337203685477580888"}},
+      "9223372036854775808 is out of range.");
 }
 
 } // namespace

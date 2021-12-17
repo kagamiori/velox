@@ -354,4 +354,55 @@ FOLLY_ALWAYS_INLINE bool call(double& result) {
 }
 VELOX_UDF_END();
 
+inline constexpr int kMinRadix = 2;
+inline constexpr int kMaxRadix = 36;
+
+template <typename T>
+struct FromBaseFunction {
+  VELOX_DEFINE_FUNCTION_TYPES(T);
+
+  FOLLY_ALWAYS_INLINE void initialize(
+      const core::QueryConfig& config,
+      const arg_type<Varchar>* /*input*/,
+      const int64_t* radix) {
+    if (radix != nullptr) {
+      VELOX_USER_CHECK_GE(
+          *radix,
+          kMinRadix,
+          "Radix must be between {} and {}.",
+          kMinRadix,
+          kMaxRadix);
+      VELOX_USER_CHECK_LE(
+          *radix,
+          kMaxRadix,
+          "Radix must be between {} and {}.",
+          kMinRadix,
+          kMaxRadix);
+      //VELOX_USER_CHECK((*radix) >= kMinRadix && (*radix) <= kMaxRadix, "Radix must be between");
+    } else {
+      VELOX_USER_FAIL("Radix must be constant.");
+    }
+  }
+
+  FOLLY_ALWAYS_INLINE bool
+  call(int64_t& result, const arg_type<Varchar>& input, int64_t radix) {
+    //size_t position;
+    char *position;
+    try {
+      //result = std::stoll(input.data(), &position, static_cast<int>(radix));
+      result = std::strtol(input.data(), &position, static_cast<int>(radix));
+      //if (position != input.size()) {
+      if (position != input.end()) {
+        throw std::invalid_argument("");
+      }
+    } catch (const std::invalid_argument& ia) {
+      VELOX_USER_FAIL("Not a valid base-{} number: {}.", radix, input.data());
+    } catch (const std::out_of_range& oor) {
+      VELOX_USER_FAIL("{} is out of range.", input.data());
+    }
+
+    return true;
+  }
+};
+
 } // namespace facebook::velox::functions

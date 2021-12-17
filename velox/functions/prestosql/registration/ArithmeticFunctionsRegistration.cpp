@@ -18,6 +18,7 @@
 #include "velox/functions/prestosql/Arithmetic.h"
 #include "velox/functions/prestosql/Bitwise.h"
 #include "velox/functions/prestosql/Rand.h"
+#include "velox/functions/prestosql/benchmarks/FromBaseBasic.h"
 
 namespace facebook::velox::functions {
 
@@ -79,6 +80,8 @@ void registerSimpleFunctions() {
   registerFunction<udf_is_nan, bool, double>({});
   registerFunction<udf_nan, double>({});
   registerFunction<RandFunction, double>({"rand", "random"});
+  registerFunction<FromBaseFunction, int64_t, Varchar, int64_t>({"from_base"});
+  //registerFunction<FromBaseFunction, int64_t, Varchar, int64_t>({"from_base_basic"});
 
 } // namespace
 } // namespace
