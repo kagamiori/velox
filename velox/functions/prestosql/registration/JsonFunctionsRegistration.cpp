@@ -16,11 +16,13 @@
 
 #include "velox/functions/Registerer.h"
 #include "velox/functions/prestosql/JsonExtractScalar.h"
+#include "velox/functions/prestosql/JsonFormat.h"
 
 namespace facebook::velox::functions {
 void registerJsonFunctions() {
   registerFunction<JsonExtractScalarFunction, Varchar, Varchar, Varchar>(
       {"json_extract_scalar"});
+  registerFunction<JsonFormatFunction, Varchar, Varchar>({"json_format"});
 }
 
 } // namespace facebook::velox::functions
