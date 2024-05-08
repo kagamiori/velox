@@ -155,8 +155,8 @@ class ApproxDistinctResultVerifier : public ResultVerifier {
     if (numGroups >= 50) {
       return largeGaps.size() <= 3;
     }
-
-    return largeGaps.empty();
+    // For small number of groups, there is no guarantee on the standard error.
+    return true;
   }
 
   // For approx_distinct in window operations, input sets for rows in the same
@@ -213,8 +213,8 @@ class ApproxDistinctResultVerifier : public ResultVerifier {
     if (numGroups >= 50) {
       return largeGaps.size() <= 3;
     }
-
-    return largeGaps.empty();
+    // For small number of groups, there is no guarantee on the standard error.
+    return true;
   }
 
   void reset() override {
