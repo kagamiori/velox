@@ -44,6 +44,9 @@ class FuzzerRunner {
       const std::unordered_map<std::string, std::string>& queryConfigs,
       const std::unordered_map<std::string, std::shared_ptr<ArgGenerator>>&
           argGenerators,
+      const std::unordered_map<
+          std::string,
+          ExpressionFuzzer::ArgsOverrideFuncPtr>& argsOverrideFuncs,
       std::shared_ptr<exec::test::ReferenceQueryRunner> referenceQueryRunner,
       const std::shared_ptr<SpecialFormSignatureGenerator>& signatureGenerator);
 
@@ -56,6 +59,9 @@ class FuzzerRunner {
       const std::unordered_map<std::string, std::string>& queryConfigs,
       const std::unordered_map<std::string, std::shared_ptr<ArgGenerator>>&
           argGenerators,
+      const std::unordered_map<
+          std::string,
+          ExpressionFuzzer::ArgsOverrideFuncPtr>& argsOverrideFuncs,
       std::shared_ptr<exec::test::ReferenceQueryRunner> referenceQueryRunner,
       const std::shared_ptr<SpecialFormSignatureGenerator>& signatureGenerator);
 };
